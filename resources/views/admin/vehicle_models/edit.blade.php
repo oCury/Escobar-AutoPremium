@@ -1,0 +1,51 @@
+<x-app-layout>
+    <x-slot name="header">
+        {{-- CORREÇÃO AQUI: Usar $vehicleModel --}}
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+            Editar Modelo: {{ $vehicleModel->name }}
+        </h2>
+    </x-slot>
+
+    <div class="py-12">
+        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+                <div class="p-6 text-gray-900">
+                    
+                    {{-- CORREÇÃO AQUI: Usar $vehicleModel na rota --}}
+                    <form action="{{ route('modelos.update', $vehicleModel) }}" method="POST">
+                        @csrf
+                        @method('PUT')
+
+                        {{-- Campo Nome --}}
+                        <div class="mb-4">
+                            <label for="name" class="block text-sm font-bold mb-2">Nome do Modelo:</label>
+                            {{-- CORREÇÃO AQUI: Usar $vehicleModel no valor --}}
+                            <input type="text" name="name" id="name" value="{{ old('name', $vehicleModel->name) }}" class="shadow rounded w-full py-2 px-3" required>
+                        </div>
+
+                        {{-- Campo Marca (Dropdown) --}}
+                        <div class="mb-4">
+                            <label for="brand_id" class="block text-sm font-bold mb-2">Marca:</label>
+                            <select name="brand_id" id="brand_id" class="shadow rounded w-full py-2 px-3" required>
+                                <option value="">Selecione uma marca</option>
+                                @foreach ($brands as $brand)
+                                    {{-- CORREÇÃO AQUI: Usar $vehicleModel para selecionar o item correto --}}
+                                    <option value="{{ $brand->id }}" @if($brand->id == $vehicleModel->brand_id) selected @endif>
+                                        {{ $brand->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        {{-- Botões --}}
+                        <div class="flex items-center justify-between">
+                            <button type="submit" class="bg-green-500 hover:bg-green-700 text-white font-bold py-2 px-4 rounded">Salvar Alterações</button>
+                            <a href="{{ route('modelos.index') }}" class="text-blue-500 hover:text-blue-800">Cancelar</a>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</x-app-layout>
