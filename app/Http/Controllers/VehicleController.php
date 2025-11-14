@@ -11,17 +11,17 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        // Carrega os veículos com suas relações para evitar múltiplas queries (N+1 problem)
-        $vehicles = Vehicle::with(['model.brand', 'color'])->get();
-        return view('admin.vehicles.index', compact('vehicles'));
+        $vehicles = Vehicle::with('vehicleModel.brand', 'color')->latest()->paginate(10);
+        return view('vehicles.index', compact('vehicles'));
     }
 
     public function create()
     {
-        // Busca os dados para preencher os dropdowns do formulário
-        $models = VehicleModel::with('brand')->orderBy('name')->get();
+        $models = VehicleModel::with('brand')->get()->sortBy('brand.name');
         $colors = Color::orderBy('name')->get();
-        return view('admin.vehicles.create', compact('models', 'colors'));
+        $currentYear = date('Y');
+        $years = range($currentYear + 1, 1950);
+        return view('vehicles.create', compact('models', 'colors', 'years'));
     }
 
     public function store(Request $request)
@@ -29,31 +29,25 @@ class VehicleController extends Controller
         $request->validate([
             'model_id' => 'required|exists:vehicle_models,id',
             'color_id' => 'required|exists:colors,id',
-            'year' => 'required|digits:4|integer|min:1900',
-            'mileage' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
+            'year' => 'required|numeric',
+            'price' => 'required|numeric',
+            'mileage' => 'required|numeric',
             'main_photo_url' => 'required|url',
-            'photo_url_2' => 'nullable|url',
-            'photo_url_3' => 'nullable|url',
-            'details' => 'nullable|string',
         ]);
-
         Vehicle::create($request->all());
-
-        return redirect()->route('veiculos.index')->with('success', 'Veículo cadastrado com sucesso!');
-    }
-
-    public function show(Vehicle $vehicle)
-    {
-        //
+        return redirect()->route('vehicles.index')->with('success', 'Veículo criado com sucesso!');
     }
 
     public function edit(Vehicle $vehicle)
     {
-        // Busca os dados para os dropdowns e o veículo específico para edição
-        $models = VehicleModel::with('brand')->orderBy('name')->get();
+        // Carregamos as relações para a view de edição.
+        $vehicle->load('vehicleModel.brand', 'color');
+
+        $models = VehicleModel::with('brand')->get()->sortBy('brand.name');
         $colors = Color::orderBy('name')->get();
-        return view('admin.vehicles.edit', compact('vehicle', 'models', 'colors'));
+        $currentYear = date('Y');
+        $years = range($currentYear + 1, 1950);
+        return view('vehicles.edit', compact('vehicle', 'models', 'colors', 'years'));
     }
 
     public function update(Request $request, Vehicle $vehicle)
@@ -61,23 +55,18 @@ class VehicleController extends Controller
         $request->validate([
             'model_id' => 'required|exists:vehicle_models,id',
             'color_id' => 'required|exists:colors,id',
-            'year' => 'required|digits:4|integer|min:1900',
-            'mileage' => 'required|integer|min:0',
-            'price' => 'required|numeric|min:0',
+            'year' => 'required|numeric',
+            'price' => 'required|numeric',
+            'mileage' => 'required|numeric',
             'main_photo_url' => 'required|url',
-            'photo_url_2' => 'nullable|url',
-            'photo_url_3' => 'nullable|url',
-            'details' => 'nullable|string',
         ]);
-
         $vehicle->update($request->all());
-
-        return redirect()->route('veiculos.index')->with('success', 'Veículo atualizado com sucesso!');
+        return redirect()->route('vehicles.index')->with('success', 'Veículo atualizado com sucesso!');
     }
 
     public function destroy(Vehicle $vehicle)
     {
         $vehicle->delete();
-        return redirect()->route('veiculos.index')->with('success', 'Veículo excluído com sucesso!');
+        return redirect()->route('vehicles.index')->with('success', 'Veículo excluído com sucesso!');
     }
 }

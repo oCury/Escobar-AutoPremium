@@ -3,20 +3,20 @@
 namespace App\Http\Controllers;
 
 use App\Models\VehicleModel;
-use App\Models\Brand; // Importar o model de Marca
+use App\Models\Brand;
 use Illuminate\Http\Request;
 
 class VehicleModelController extends Controller
 {
     public function index()
     {
-        $models = VehicleModel::with('brand')->get();
-        return view('admin.vehicle_models.index', ['models' => $models]);
+        $vehicle_models = VehicleModel::with('brand')->latest()->paginate(10);
+        return view('admin.vehicle_models.index', compact('vehicle_models'));
     }
 
     public function create()
     {
-        $brands = Brand::orderBy('name')->get(); // Pega todas as marcas para o dropdown
+        $brands = Brand::orderBy('name')->get();
         return view('admin.vehicle_models.create', compact('brands'));
     }
 
@@ -24,36 +24,31 @@ class VehicleModelController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'brand_id' => 'required|exists:brands,id', // Valida se a marca existe
+            'brand_id' => 'required|exists:brands,id',
         ]);
         VehicleModel::create($request->all());
-        return redirect()->route('modelos.index')->with('success', 'Modelo criado com sucesso!');
+        return redirect()->route('vehicle_models.index')->with('success', 'Modelo criado com sucesso!');
     }
 
-    public function show(VehicleModel $vehicleModel)
-    {
-        //
-    }
-
-    public function edit(VehicleModel $vehicleModel)
+    public function edit(VehicleModel $vehicle_model)
     {
         $brands = Brand::orderBy('name')->get();
-        return view('admin.vehicle_models.edit', compact('vehicleModel', 'brands'));
+        return view('admin.vehicle_models.edit', compact('vehicle_model', 'brands'));
     }
 
-    public function update(Request $request, VehicleModel $vehicleModel)
+    public function update(Request $request, VehicleModel $vehicle_model)
     {
         $request->validate([
             'name' => 'required|string|max:255',
             'brand_id' => 'required|exists:brands,id',
         ]);
-        $vehicleModel->update($request->all());
-        return redirect()->route('modelos.index')->with('success', 'Modelo atualizado com sucesso!');
+        $vehicle_model->update($request->all());
+        return redirect()->route('vehicle_models.index')->with('success', 'Modelo atualizado com sucesso!');
     }
 
-    public function destroy(VehicleModel $vehicleModel)
+    public function destroy(VehicleModel $vehicle_model)
     {
-        $vehicleModel->delete();
-        return redirect()->route('modelos.index')->with('success', 'Modelo excluído com sucesso!');
+        $vehicle_model->delete();
+        return redirect()->route('vehicle_models.index')->with('success', 'Modelo excluído com sucesso!');
     }
 }

@@ -10,33 +10,34 @@ class Vehicle extends Model
     use HasFactory;
 
     /**
-     * Os atributos que podem ser atribuídos em massa.
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
      */
     protected $fillable = [
         'model_id',
         'color_id',
         'year',
-        'mileage',
         'price',
-        'details',
+        'mileage',
         'main_photo_url',
-        'photo_url_2',
-        'photo_url_3',
+        'details',
     ];
 
     /**
-     * Relação: Um Veículo pertence a um Modelo.
+     * Define a relação: Um Veículo PERTENCE A UM Modelo de Veículo.
+     * Esta é a "ponte" que estava quebrada.
      */
-    public function model()
+    public function vehicleModel()
     {
-        return $this->belongsTo(VehicleModel::class);
+        return $this->belongsTo(VehicleModel::class, 'model_id');
     }
 
     /**
-     * Relação: Um Veículo pertence a uma Cor.
+     * Define a relação: Um Veículo PERTENCE A UMA Cor.
      */
     public function color()
     {
-        return $this->belongsTo(Color::class);
+        return $this->belongsTo(Color::class, 'color_id');
     }
 }

@@ -1,56 +1,45 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-            Gerenciar Cores
-        </h2>
+        <div class="flex justify-between items-center">
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Gerenciar Cores</h2>
+         
+            <a href="{{ route('colors.create') }}" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Adicionar Nova Cor</a>
+        </div>
     </x-slot>
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+            @if (session('success'))
+                <div class="mb-4 p-4 bg-green-100 text-green-800 border-green-200 rounded-md">{{ session('success') }}</div>
+            @endif
             <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900">
-                    
-                    <a href="{{ route('cores.create') }}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded mb-4 inline-block">
-                        Adicionar Nova Cor
-                    </a>
-
-                    <table class="min-w-full bg-white border border-gray-200">
-                        <thead class="bg-gray-100">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                            <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white divide-y divide-gray-200">
+                        @forelse ($colors as $color)
                             <tr>
-                                <th class="py-2 px-4 border-b text-left">ID</th>
-                                <th class="py-2 px-4 border-b text-left">Nome</th>
-                                <th class="py-2 px-4 border-b text-left">Ações</th>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $color->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                               
+                                    <a href="{{ route('colors.edit', $color) }}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
+                        
+                                    <form action="{{ route('colors.destroy', $color) }}" method="POST" class="inline-block ml-4" onsubmit="return confirm('Tem certeza?');">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="text-red-600 hover:text-red-900">Excluir</button>
+                                    </form>
+                                </td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @forelse ($colors as $color)
-                                 <tr class="border-b">
-                                    <td class="py-2 px-4">{{ $color->id }}</td>
-                                    <td class="py-2 px-4">{{ $color->name }}</td>
-                                    <td class="py-2 px-4">
-                                        {{-- ▼▼▼ BOTÃO DE EDITAR ▼▼▼ --}}
-                                        <a href="{{ route('cores.edit', $color) }}" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                            Editar
-                                        </a>
-                                        {{-- ▼▼▼ FORMULÁRIO DE EXCLUIR ▼▼▼ --}}
-                                        <form action="{{ route('cores.destroy', $color) }}" method="POST" onsubmit="return confirm('Tem certeza que deseja excluir esta cor?');">
-                                            @csrf
-                                            @method('DELETE')
-                                            <button type="submit" class="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-3 rounded text-xs">
-                                                Excluir
-                                            </button>
-                                        </form>
-                                    </td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="3" class="py-4 px-4 text-center text-gray-500">Nenhuma cor cadastrada.</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
-
-                </div>
+                        @empty
+                            <tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">Nenhuma cor encontrada.</td></tr>
+                        @endforelse
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

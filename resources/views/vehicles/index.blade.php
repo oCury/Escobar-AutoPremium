@@ -1,9 +1,8 @@
 <x-app-layout>
     <x-slot name="header">
         <div class="flex justify-between items-center">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Gerenciar Marcas</h2>
-           
-            <a href="{{ route('brands.create') }}" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Adicionar Nova Marca</a>
+            <h2 class="font-semibold text-xl text-gray-800 leading-tight">Gerenciar Veículos</h2>
+            <a href="{{ route('vehicles.create') }}" class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Adicionar Novo Veículo</a>
         </div>
     </x-slot>
 
@@ -17,18 +16,23 @@
                     <thead class="bg-gray-50">
                         <tr>
                             <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Nome</th>
+                            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Preço</th>
                             <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">Ações</th>
                         </tr>
                     </thead>
                     <tbody class="bg-white divide-y divide-gray-200">
-                        @forelse ($brands as $brand)
+                        @forelse ($vehicles as $vehicle)
                             <tr>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ $brand->name }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    <div class="text-sm font-medium text-gray-900">{{ $vehicle->vehicleModel->brand->name ?? 'Marca Desconhecida' }} {{ $vehicle->vehicleModel->name ?? '' }}</div>
+                                    <div class="text-sm text-gray-500">{{ $vehicle->year }}</div>
+                                </td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">R$ {{ number_format($vehicle->price, 2, ',', '.') }}</td>
                                 <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                
-                                    <a href="{{ route('brands.edit', $brand) }}" class="text-indigo-600 hover:text-indigo-900">Editar</a>
-                                 
-                                    <form action="{{ route('brands.destroy', $brand) }}" method="POST" class="inline-block ml-4" onsubmit="return confirm('Tem certeza?');">
+                                    
+                                    {{-- Botão Editar foi REMOVIDO --}}
+                                    
+                                    <form action="{{ route('vehicles.destroy', $vehicle) }}" method="POST" class="inline-block" onsubmit="return confirm('Tem certeza que deseja excluir este veículo?');">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="text-red-600 hover:text-red-900">Excluir</button>
@@ -36,7 +40,7 @@
                                 </td>
                             </tr>
                         @empty
-                            <tr><td colspan="2" class="px-6 py-4 text-center text-gray-500">Nenhuma marca encontrada.</td></tr>
+                            <tr><td colspan="3" class="px-6 py-4 text-center text-gray-500">Nenhum veículo cadastrado.</td></tr>
                         @endforelse
                     </tbody>
                 </table>

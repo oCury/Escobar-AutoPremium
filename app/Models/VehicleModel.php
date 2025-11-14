@@ -9,11 +9,36 @@ class VehicleModel extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'brand_id'];
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'vehicle_models'; // Garante que o nome da tabela está correto
 
-    // Define a relação: Um Modelo (VehicleModel) pertence a uma Marca (Brand)
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'brand_id',
+        'name',
+    ];
+
+    /**
+     * Define a relação: Um Modelo de Veículo PERTENCE A UMA Marca.
+     */
     public function brand()
     {
-        return $this->belongsTo(Brand::class);
+        return $this->belongsTo(Brand::class, 'brand_id');
+    }
+
+    /**
+     * Define a relação: Um Modelo de Veículo PODE TER VÁRIOS Veículos.
+     */
+    public function vehicles()
+    {
+        return $this->hasMany(Vehicle::class, 'model_id');
     }
 }

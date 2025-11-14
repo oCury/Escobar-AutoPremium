@@ -9,7 +9,7 @@ class ColorController extends Controller
 {
     public function index()
     {
-        $colors = Color::all();
+        $colors = Color::latest()->paginate(10);
         return view('admin.colors.index', compact('colors'));
     }
 
@@ -22,12 +22,7 @@ class ColorController extends Controller
     {
         $request->validate(['name' => 'required|string|max:255|unique:colors']);
         Color::create($request->all());
-        return redirect()->route('cores.index')->with('success', 'Cor criada com sucesso!');
-    }
-
-    public function show(Color $color)
-    {
-        // Não usado por enquanto
+        return redirect()->route('colors.index')->with('success', 'Cor criada com sucesso!');
     }
 
     public function edit(Color $color)
@@ -39,12 +34,12 @@ class ColorController extends Controller
     {
         $request->validate(['name' => 'required|string|max:255|unique:colors,name,' . $color->id]);
         $color->update($request->all());
-        return redirect()->route('cores.index')->with('success', 'Cor atualizada com sucesso!');
+        return redirect()->route('colors.index')->with('success', 'Cor atualizada com sucesso!');
     }
 
     public function destroy(Color $color)
     {
         $color->delete();
-        return redirect()->route('cores.index')->with('success', 'Cor excluída com sucesso!');
+        return redirect()->route('colors.index')->with('success', 'Cor excluída com sucesso!');
     }
 }
